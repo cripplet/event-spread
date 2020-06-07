@@ -35,15 +35,20 @@ class _Global(object):
 Global = dataclasses.dataclass(_Global)
 
 
+def IsPropagated(
+    e: Event,
+    pos: Pos,
+    timestamp: datetime.datetime) -> bool:
+  d = ((pos.x - e.pos.x) ** 2 + (pos.y - e.pos.y) ** 2) ** .5
+  return (timestamp - e.timestamp).total_seconds() * e.spread_rate >= d
+
+
 def GetEventInfluence(
     e: Event,
     pos: Pos,
     timestamp: datetime.datetime,
     heuristic: Heuristic) -> float:
-  d = ((pos.x - e.pos.x) ** 2 + (pos.y - e.pos.y) ** 2) ** .5
-  return e.influence[heuristic] if (
-      (timestamp - e.timestamp).total_seconds() * e.spread_rate >= d
-  ) else 0
+  return e.influence[heuristic] if IsPropagated(e, pos, timestamp) else 0
 
 
 def GetInfluence(
