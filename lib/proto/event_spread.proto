@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package event_spread.lib.proto;
+option go_package = "event_spread_lib_proto";
+
+import "google/protobuf/timestamp.proto";
+
+enum Heuristic {
+  HEURISTIC_UNKNOWN = 0;
+  HEURISTIC_MORALITY = 1;
+
+  reserved 2 to 1000;
+}
+
+enum SpreadType {
+  SPREAD_TYPE_UNKNOWN = 0;
+  SPREAD_TYPE_INSTANT_GLOBAL = 1;
+  SPREAD_TYPE_SIMPLE_LINEAR = 2;
+
+  reserved 3 to 1000;
+}
+
+message Position {
+  float x = 1;
+  float y = 2;
+}
+
+message HeuristicValue {
+  Heuristic heuristic = 1;
+  float value = 2;
+}
+
+message Event {
+  Position position = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  repeated HeuristicValue heuristics = 3;
+  SpreadType spread_type = 4;
+  float spread_rate = 5;  
+}
+
+service EventSpreadService {
+  rpc AddEvent(AddEventRequest) returns (AddEventResponse) {}
+  rpc GetEventSpread(GetEventSpreadRequest) returns (GetEventSpreadResponse) {}
+}
+
+message AddEventRequest {
+  Event event = 1;
+}
+
+message AddEventResponse {}
+
+message GetEventSpreadRequest {
+  Heuristic heuristic = 1;
+  Position position = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message GetEventSpreadResponse {
+  float value = 1;
+}
