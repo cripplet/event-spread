@@ -38,4 +38,9 @@ func TestAddEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpectedly received error when adding Event: %v", err)
 	}
+	s.eventsMux.Lock()
+	defer s.eventsMux.Unlock()
+	if len(s.events) != 1 {
+		t.Errorf("unexpected event queue length: expected %v, but got %v", 1, len(s.events))
+	}
 }
