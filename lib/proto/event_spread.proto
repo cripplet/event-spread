@@ -50,11 +50,11 @@ message AddEventRequest {
 message AddEventResponse {}
 
 message GetEventSpreadRequest {
-  Heuristic heuristic = 1;
+  repeated Heuristic heuristics = 1;
   Position position = 2;
   google.protobuf.Timestamp timestamp = 3;
 }
 
 message GetEventSpreadResponse {
-  float value = 1;
+  repeated HeuristicValue values = 1;
 }

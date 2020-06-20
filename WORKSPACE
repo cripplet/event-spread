@@ -66,3 +66,10 @@ go_repository(
     sum = "h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=",
     version = "v0.3.0",
 )
+
+go_repository(
+    name = "org_golang_google_protobuf",
+    importpath = "google.golang.org/protobuf",
+    # TODO(cripplet): Monitor this repo for when we can move away from ptypes.
+    commit = "5c3dd7024aed895adfe053f26b5a479e991cbca9",  # v1.24.0
+)

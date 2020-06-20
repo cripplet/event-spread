@@ -32,8 +32,47 @@ func (s *EventSpreadService) AddEvent(ctx context.Context, req *espb.AddEventReq
 	return &espb.AddEventResponse{}, nil
 }
 
+func eventSpread(e *espb.Event, hs []espb.Heuristic, vc chan<- *espb.HeuristicValue) error {
+	// TODO(cripplet): Implement.
+	return nil
+}
+
 func (s *EventSpreadService) GetEventSpread(ctx context.Context, req *espb.GetEventSpreadRequest) (*espb.GetEventSpreadResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "GetEventSpread has not been implemented")
+	s.eventsMux.Lock()
+	defer s.eventsMux.Unlock()
+
+	vc := make(chan *espb.HeuristicValue)
+	ec := make(chan error)
+	var wg sync.WaitGroup
+
+	wg.Add(len(s.events))
+	for _, e := range s.events {
+		go func(e *espb.Event, hs []espb.Heuristic, vc chan<- *espb.HeuristicValue, ec chan<- error) {
+			defer wg.Done()
+			ec <- eventSpread(e, hs, vc)
+		}(e, req.GetHeuristics(), vc, ec)
+	}
+	wg.Wait()
+	close(ec)
+	close(vc)
+
+	var errors []error
+	for err := range ec {
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if len(errors) > 0 {
+		return nil, status.Errorf(codes.Aborted, "could not calculate event spread due to error(s) %v", errors)
+	}
+
+	resp := &espb.GetEventSpreadResponse{}
+	for _ = range vc {
+		// TODO(cripplet): Switch over to SetValue() once setters are part of Golang protobuf API.
+		// TODO(cripplet): Implement.
+	}
+
+	return resp, nil
 }
 
 // NewEventSpreadService constructs a new implementation object.

@@ -95,8 +95,7 @@ if __name__ == '__main__':
       early_event, Pos(0, 0), early_event.timestamp, Heuristic.HEURISTIC_MORALITY) == 0
 
   assert GetEventInfluence(
-      early_event,
-      Pos(g.dim.x * 2, g.dim.y * 2),
+      early_event, Pos(g.dim.x * 2, g.dim.y * 2),
       early_event.timestamp + datetime.timedelta(
           seconds=(max(g.dim.x, g.dim.y) * 2 ** .5 / early_event.spread_rate)
       ),
