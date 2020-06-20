@@ -32,7 +32,7 @@ func (s *EventSpreadService) AddEvent(ctx context.Context, req *espb.AddEventReq
 	return &espb.AddEventResponse{}, nil
 }
 
-func eventSpread(e *espb.Event, hs []espb.Heuristic, vc chan<- *espb.HeuristicValue) error {
+func eventSpread(e *espb.Event, req *espb.GetEventSpreadRequest, vc chan<- *espb.HeuristicValue) error {
 	// TODO(cripplet): Implement.
 	return nil
 }
@@ -47,10 +47,10 @@ func (s *EventSpreadService) GetEventSpread(ctx context.Context, req *espb.GetEv
 
 	wg.Add(len(s.events))
 	for _, e := range s.events {
-		go func(e *espb.Event, hs []espb.Heuristic, vc chan<- *espb.HeuristicValue, ec chan<- error) {
+		go func(e *espb.Event, req *espb.GetEventSpreadRequest, vc chan<- *espb.HeuristicValue, ec chan<- error) {
 			defer wg.Done()
-			ec <- eventSpread(e, hs, vc)
-		}(e, req.GetHeuristics(), vc, ec)
+			ec <- eventSpread(e, req, vc)
+		}(e, req, vc, ec)
 	}
 	wg.Wait()
 	close(ec)
