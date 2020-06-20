@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 
-	espb "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto"
+	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
 
 )
 

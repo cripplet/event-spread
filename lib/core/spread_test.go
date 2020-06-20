@@ -8,8 +8,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	// "google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/cripplet/event-spread/core/handlers"
-	espb "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto"
+	"github.com/cripplet/event-spread/lib/core/handlers"
+	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
 )
 
 // TODO(cripplet): Decide if we need to do full e2e testing via
@@ -42,7 +42,7 @@ var (
 )
 
 func TestAddNullEvent(t *testing.T) {
-	s, _ := NewEventSpreadService(nil)
+	s := NewEventSpreadService(nil)
 	_, err := s.AddEvent(context.Background(), &espb.AddEventRequest{})
 	if err == nil {
 		t.Error("unexpectedly succeeded in adding empty Event to event queue")
@@ -50,7 +50,7 @@ func TestAddNullEvent(t *testing.T) {
 }
 
 func TestAddEvent(t *testing.T) {
-	s, _ := NewEventSpreadService(nil)
+	s := NewEventSpreadService(nil)
 
 	_, err := s.AddEvent(context.Background(), &espb.AddEventRequest{ Event: trivialEvent, })
 	if err != nil {
@@ -86,7 +86,7 @@ func EventSpreadHelper(
 
 func TestGetEventSpreadNullEvents(t *testing.T) {
 	h := espb.Heuristic_HEURISTIC_MORALITY
-	s, _ := NewEventSpreadService(dispatcher)
+	s := NewEventSpreadService(dispatcher)
 
 	resp, err := EventSpreadHelper(
 		t,
@@ -112,7 +112,7 @@ func TestGetEventSpreadNullEvents(t *testing.T) {
 
 func TestGetEventSpread(t *testing.T) {
 	h := espb.Heuristic_HEURISTIC_MORALITY
-	s, _ := NewEventSpreadService(dispatcher)
+	s := NewEventSpreadService(dispatcher)
 
 	resp, err := EventSpreadHelper(
 		t,

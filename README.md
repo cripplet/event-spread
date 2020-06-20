@@ -10,3 +10,7 @@ bazel 3.2.0
 
 $ bazel test //lib/core:all --features=race --runs_per_test=100
 ```
+## Running
+```
+$ bazel run //bin:main -- --grpc=true  # run gRPC instead of REST traffic
+```

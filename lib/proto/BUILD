@@ -13,6 +13,6 @@ proto_library(
 
 go_grpc_library(
     name = "event_spread_go_proto",
-    importpath = "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto",
+    importpath = "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto",
     proto = ":event_spread_proto",
 )

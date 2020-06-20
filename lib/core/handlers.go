@@ -10,7 +10,7 @@ import (
 	// TODO(cripplet): Use the new-style Timestamp constructors once the release picks up the syntax.
 	// "google.golang.org/protobuf/types/known/timestamppb"
 
-	espb "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto"
+	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
 )
 
 // EventSpread will calculate the global influence contribution by a single Event object and return a

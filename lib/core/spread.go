@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
@@ -12,23 +11,15 @@ import (
         // TODO(cripplet): Use the new-style Timestamp constructors once the release picks up the syntax.
         // "google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/cripplet/event-spread/core/handlers"
-	espb "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto"
+	"github.com/cripplet/event-spread/lib/core/handlers"
+	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
 )
 
 // NewEventSpreadService constructs a new implementation object.
-func NewEventSpreadService(dispatcher map[espb.SpreadType]handlers.EventSpreadHandler) (*EventSpreadService, error) {
+func NewEventSpreadService(dispatcher map[espb.SpreadType]handlers.EventSpreadHandler) *EventSpreadService {
 	return &EventSpreadService{
 		spreadTypeDispatcher: dispatcher,
-	}, nil
-}
-
-// NewServer creates and returns an RPC service. This will be used in binaries
-// to actually run the server against a port.
-func NewServer(s *EventSpreadService) (*grpc.Server, error) {
-	grpcServer := grpc.NewServer()
-	espb.RegisterEventSpreadServiceServer(grpcServer, s)
-	return grpcServer, nil
+	}
 }
 
 // EventSpreadService implements the espb.EventSpreadService RPC.
