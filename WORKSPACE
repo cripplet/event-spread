@@ -73,3 +73,9 @@ go_repository(
     # TODO(cripplet): Monitor this repo for when we can move away from ptypes.
     commit = "5c3dd7024aed895adfe053f26b5a479e991cbca9",  # v1.24.0
 )
+
+go_repository(
+    name = "com_github_google_go_cmp",
+    importpath = "github.com/google/go-cmp",
+    commit = "77ae86f624cb174e21763cffcbbf070eb06cb016",  # v0.5.0
+)

@@ -9,11 +9,31 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
 
+        // TODO(cripplet): Use the new-style Timestamp constructors once the release picks up the syntax.
+        // "google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/cripplet/event-spread/core/handlers"
 	espb "github.com/cripplet/event_spread/lib/proto/event_spread_go_proto"
 )
 
+// NewEventSpreadService constructs a new implementation object.
+func NewEventSpreadService(dispatcher map[espb.SpreadType]handlers.EventSpreadHandler) (*EventSpreadService, error) {
+	return &EventSpreadService{
+		spreadTypeDispatcher: dispatcher,
+	}, nil
+}
+
+// NewServer creates and returns an RPC service. This will be used in binaries
+// to actually run the server against a port.
+func NewServer(s *EventSpreadService) (*grpc.Server, error) {
+	grpcServer := grpc.NewServer()
+	espb.RegisterEventSpreadServiceServer(grpcServer, s)
+	return grpcServer, nil
+}
+
 // EventSpreadService implements the espb.EventSpreadService RPC.
 type EventSpreadService struct {
+	spreadTypeDispatcher map[espb.SpreadType]handlers.EventSpreadHandler
 	eventsMux sync.Mutex
 	events []*espb.Event
 }
@@ -32,59 +52,36 @@ func (s *EventSpreadService) AddEvent(ctx context.Context, req *espb.AddEventReq
 	return &espb.AddEventResponse{}, nil
 }
 
-func eventSpread(e *espb.Event, req *espb.GetEventSpreadRequest, vc chan<- *espb.HeuristicValue) error {
-	// TODO(cripplet): Implement.
-	return nil
-}
-
+// GetEventSpread gets total influence of Heuristic types specified in the request.
 func (s *EventSpreadService) GetEventSpread(ctx context.Context, req *espb.GetEventSpreadRequest) (*espb.GetEventSpreadResponse, error) {
-	s.eventsMux.Lock()
-	defer s.eventsMux.Unlock()
+	// Make a copy of events -- some level of inconsistency between ~concurrent requests is expected.
+	events := func() []*espb.Event {
+		s.eventsMux.Lock()
+		defer s.eventsMux.Unlock()
+		es := []*espb.Event{}
+		for _, e := range s.events {
+			es = append(es, proto.Clone(e).(*espb.Event))
+		}
+		return es
+	}()
 
-	vc := make(chan *espb.HeuristicValue)
-	ec := make(chan error)
-	var wg sync.WaitGroup
-
-	wg.Add(len(s.events))
-	for _, e := range s.events {
-		go func(e *espb.Event, req *espb.GetEventSpreadRequest, vc chan<- *espb.HeuristicValue, ec chan<- error) {
-			defer wg.Done()
-			ec <- eventSpread(e, req, vc)
-		}(e, req, vc, ec)
+	var l []*espb.HeuristicValue
+	for _, h := range req.GetHeuristics() {
+		l = append(l, &espb.HeuristicValue{ Heuristic: h })
 	}
-	wg.Wait()
-	close(ec)
-	close(vc)
 
-	var errors []error
-	for err := range ec {
+	// TODO(cripplet): Make this concurrent.
+	for _, e := range events {
+		ch, err := handlers.EventSpread(s.spreadTypeDispatcher, e, req)
 		if err != nil {
-			errors = append(errors, err)
+			return nil, status.Errorf(codes.Internal, "could not get influence, got error %v", err)
+		}
+		for hv := range ch {
+			l = append(l, hv)
 		}
 	}
-	if len(errors) > 0 {
-		return nil, status.Errorf(codes.Aborted, "could not calculate event spread due to error(s) %v", errors)
-	}
 
-	resp := &espb.GetEventSpreadResponse{}
-	for _ = range vc {
-		// TODO(cripplet): Switch over to SetValue() once setters are part of Golang protobuf API.
-		// TODO(cripplet): Implement.
-	}
-
-	return resp, nil
-}
-
-// NewEventSpreadService constructs a new implementation object.
-func NewEventSpreadService() (*EventSpreadService, error) {
-	return &EventSpreadService{}, nil
-}
-
-// NewServer creates and returns an RPC service. This will be used in binaries
-// to actually run the server against a port.
-func NewServer() (*grpc.Server, error) {
-	service, _ := NewEventSpreadService()
-	s := grpc.NewServer()
-	espb.RegisterEventSpreadServiceServer(s, service)
-	return s, nil
+	return &espb.GetEventSpreadResponse{
+		Values: handlers.MapToList(handlers.ListToMap(l)),
+	}, nil
 }
