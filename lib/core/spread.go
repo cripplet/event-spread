@@ -1,3 +1,5 @@
+// Package spread provides an implementation of the EventSpreadService RPC proto.
+// This will be loaded into a gRPC server at runtime.
 package spread
 
 import (

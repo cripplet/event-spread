@@ -1,3 +1,6 @@
+// Package main starts up a gRPC server which serves the EventSpreadService RPC.
+// This is an example -- separate implementations will define custom dispatchers
+// (which will call custom EventSpreadHandlers).
 package main
 
 import (

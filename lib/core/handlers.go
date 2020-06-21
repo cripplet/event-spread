@@ -1,3 +1,4 @@
+// Package handlers provides the interface for calculating influence propagation in a game state.
 package handlers
 
 import (
