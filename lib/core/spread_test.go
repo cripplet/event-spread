@@ -25,12 +25,12 @@ var (
 
 	trivialHeuristicValue = &espb.HeuristicValue{
 		Heuristic: espb.Heuristic_HEURISTIC_MORALITY,
-		Value: 100,
+		Value:     100,
 	}
 
 	trivialEvent = &espb.Event{
-		Position: &espb.Position{X: 0, Y: 0},
-		Timestamp: ts,
+		Position:   &espb.Position{X: 0, Y: 0},
+		Timestamp:  ts,
 		Heuristics: []*espb.HeuristicValue{trivialHeuristicValue},
 		SpreadType: espb.SpreadType_SPREAD_TYPE_INSTANT_GLOBAL,
 	}
@@ -38,7 +38,6 @@ var (
 	dispatcher = map[espb.SpreadType]handlers.EventSpreadHandler{
 		espb.SpreadType_SPREAD_TYPE_INSTANT_GLOBAL: &handlers.InstantGlobalEventSpreadHandler{},
 	}
-
 )
 
 func TestAddNullEvent(t *testing.T) {
@@ -52,7 +51,7 @@ func TestAddNullEvent(t *testing.T) {
 func TestAddEvent(t *testing.T) {
 	s := NewEventSpreadService(nil)
 
-	_, err := s.AddEvent(context.Background(), &espb.AddEventRequest{ Event: trivialEvent, })
+	_, err := s.AddEvent(context.Background(), &espb.AddEventRequest{Event: trivialEvent})
 	if err != nil {
 		t.Errorf("unexpectedly received error when adding Event: %v", err)
 	}
@@ -71,18 +70,17 @@ func EventSpreadHelper(
 	queryTime time.Time,
 	hs []espb.Heuristic) (*espb.GetEventSpreadResponse, error) {
 	for _, e := range events {
-		s.AddEvent(context.Background(), &espb.AddEventRequest{ Event: e, })
+		s.AddEvent(context.Background(), &espb.AddEventRequest{Event: e})
 	}
 
 	q, _ := ptypes.TimestampProto(queryTime)
 	req := &espb.GetEventSpreadRequest{
 		Heuristics: hs,
-		Timestamp: q,
+		Timestamp:  q,
 	}
 
 	return s.GetEventSpread(context.Background(), req)
 }
-
 
 func TestGetEventSpreadNullEvents(t *testing.T) {
 	h := espb.Heuristic_HEURISTIC_MORALITY

@@ -1,8 +1,8 @@
 package handlers
 
 import (
-        "google.golang.org/grpc/status"
-        "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/golang/protobuf/ptypes"
@@ -31,7 +31,9 @@ func EventSpread(dispatcher map[espb.SpreadType]EventSpreadHandler, e *espb.Even
 
 	go func() {
 		defer close(vc)
-		for _, h := range hv { vc <- h }
+		for _, h := range hv {
+			vc <- h
+		}
 	}()
 	return vc, nil
 }
@@ -49,7 +51,7 @@ type EventSpreadHandler interface {
 	IsPropagated(e *espb.Event, t *timestamp.Timestamp) (bool, error)
 
 	// EventSpread does the heavy lifting in calculating the values of the influence propagation.
-        EventSpread(e *espb.Event, req *espb.GetEventSpreadRequest) ([]*espb.HeuristicValue, error)
+	EventSpread(e *espb.Event, req *espb.GetEventSpreadRequest) ([]*espb.HeuristicValue, error)
 }
 
 // ListToMap is a convenience function to help implement contains-syntax testing and comparison.
@@ -82,7 +84,7 @@ func MapToList(heuristicMap map[espb.Heuristic]*espb.HeuristicValue) []*espb.Heu
 // SPREAD_TYPE_INSTANT_GLOBAL.
 //
 // TODO(cripplet): Move to separate file.
-type InstantGlobalEventSpreadHandler struct {}
+type InstantGlobalEventSpreadHandler struct{}
 
 // IsPropagated will return True if the input timestamp is at or after the event timstamp, since
 // influence propagation is instantaneous for this implementation.
@@ -107,7 +109,7 @@ func (h *InstantGlobalEventSpreadHandler) EventSpread(e *espb.Event, req *espb.G
 
 	var l []*espb.HeuristicValue
 	for _, h := range req.GetHeuristics() {
-		l = append(l, &espb.HeuristicValue{ Heuristic: h })
+		l = append(l, &espb.HeuristicValue{Heuristic: h})
 	}
 
 	if !isPropagated {

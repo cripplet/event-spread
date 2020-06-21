@@ -4,15 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
 
 	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
-
 )
 
 const (
-	heuristicEnum = espb.Heuristic_HEURISTIC_MORALITY
+	heuristicEnum  = espb.Heuristic_HEURISTIC_MORALITY
 	spreadTypeEnum = espb.SpreadType_SPREAD_TYPE_INSTANT_GLOBAL
 )
 
@@ -39,10 +38,10 @@ func TestMapToListEmptyMap(t *testing.T) {
 func TestListToMapSimple(t *testing.T) {
 	e := &espb.HeuristicValue{
 		Heuristic: heuristicEnum,
-		Value: 1,
+		Value:     1,
 	}
 
-	l := []*espb.HeuristicValue{ proto.Clone(e).(*espb.HeuristicValue) }
+	l := []*espb.HeuristicValue{proto.Clone(e).(*espb.HeuristicValue)}
 	m := ListToMap(l)
 	if !proto.Equal(m[heuristicEnum], e) {
 		t.Errorf("unexpected diff of HeuristicValue map entry, expected %v but got %v", e, m[heuristicEnum])
@@ -52,12 +51,12 @@ func TestListToMapSimple(t *testing.T) {
 func TestListToMapMerge(t *testing.T) {
 	e := &espb.HeuristicValue{
 		Heuristic: heuristicEnum,
-		Value: 3,
+		Value:     3,
 	}
 
 	l := []*espb.HeuristicValue{
-		&espb.HeuristicValue{ Heuristic: heuristicEnum, Value: 1, },
-		&espb.HeuristicValue{ Heuristic: heuristicEnum, Value: 2, },
+		{Heuristic: heuristicEnum, Value: 1},
+		{Heuristic: heuristicEnum, Value: 2},
 	}
 	m := ListToMap(l)
 	if !proto.Equal(m[heuristicEnum], e) {
@@ -68,7 +67,7 @@ func TestListToMapMerge(t *testing.T) {
 func TestMapToListSimple(t *testing.T) {
 	e := &espb.HeuristicValue{
 		Heuristic: heuristicEnum,
-		Value: 1,
+		Value:     1,
 	}
 
 	m := map[espb.Heuristic]*espb.HeuristicValue{
@@ -86,18 +85,18 @@ func EventSpreadRequestHelper(t *testing.T, initTime time.Time, queryTime time.T
 
 	hv := &espb.HeuristicValue{
 		Heuristic: heuristicEnum,
-		Value: 1,
+		Value:     1,
 	}
 
 	e := &espb.Event{
 		SpreadType: spreadTypeEnum,
-		Heuristics: []*espb.HeuristicValue{ hv },
-		Timestamp: i,
+		Heuristics: []*espb.HeuristicValue{hv},
+		Timestamp:  i,
 	}
 
 	req := &espb.GetEventSpreadRequest{
-		Heuristics: []espb.Heuristic{ heuristicEnum },
-		Timestamp: q,
+		Heuristics: []espb.Heuristic{heuristicEnum},
+		Timestamp:  q,
 	}
 
 	l, err := (&InstantGlobalEventSpreadHandler{}).EventSpread(e, req)
@@ -116,7 +115,7 @@ func TestInstantGlobalBefore(t *testing.T) {
 	)
 	expectedHeuristicValue := &espb.HeuristicValue{
 		Heuristic: heuristicEnum,
-		Value: 0,
+		Value:     0,
 	}
 
 	if err != nil {

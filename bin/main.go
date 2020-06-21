@@ -37,7 +37,6 @@ func main() {
 		log.Fatalf("failed to start server on %s with error %v", addr, err)
 	}
 
-
 	log.Printf("serving on %s", addr)
 
 	log.Fatal(s.Serve(conn))

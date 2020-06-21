@@ -4,12 +4,12 @@ import (
 	"context"
 	"sync"
 
-	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
-        // TODO(cripplet): Use the new-style Timestamp constructors once the release picks up the syntax.
-        // "google.golang.org/protobuf/types/known/timestamppb"
+	// TODO(cripplet): Use the new-style Timestamp constructors once the release picks up the syntax.
+	// "google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/cripplet/event-spread/lib/core/handlers"
 	espb "github.com/cripplet/event-spread/lib/proto/event_spread_go_proto"
@@ -25,8 +25,8 @@ func NewEventSpreadService(dispatcher map[espb.SpreadType]handlers.EventSpreadHa
 // EventSpreadService implements the espb.EventSpreadService RPC.
 type EventSpreadService struct {
 	spreadTypeDispatcher map[espb.SpreadType]handlers.EventSpreadHandler
-	eventsMux sync.Mutex
-	events []*espb.Event
+	eventsMux            sync.Mutex
+	events               []*espb.Event
 }
 
 // AddEvent adds the specified espb.Event object into the state queue. Events
@@ -58,7 +58,7 @@ func (s *EventSpreadService) GetEventSpread(ctx context.Context, req *espb.GetEv
 
 	var l []*espb.HeuristicValue
 	for _, h := range req.GetHeuristics() {
-		l = append(l, &espb.HeuristicValue{ Heuristic: h })
+		l = append(l, &espb.HeuristicValue{Heuristic: h})
 	}
 
 	// TODO(cripplet): Make this concurrent.
