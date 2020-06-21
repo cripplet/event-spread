@@ -9,5 +9,6 @@ go_binary(
         "//lib/core:spread",
 	"//lib/proto:event_spread_go_proto",
         "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//reflection:go_default_library",
     ],
 )
